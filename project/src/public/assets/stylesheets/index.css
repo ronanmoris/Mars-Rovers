@@ -7,8 +7,8 @@ body {
   min-height: 100vh;
 }
 
-header {
-  /* header styles */
+header h1 {
+  font-size: 1.8rem;
 }
 
 main {
@@ -16,23 +16,159 @@ main {
   padding: 20px;
 }
 
-footer {
-  /* footer styles */
+#root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.info-buttons-section {
+  text-align: center;
+    margin: 1rem 0;
+    border: 1px solid lightgray;
+    padding: 1rem;
+    border-radius: 3%;
+}
+
+.buttons-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 1rem 0;
+  width: 320px;
+}
+
+.btn {
+  background-color: #fff;
+  border: 2px solid #4C586F;
+  border-radius: 10px;
+
+  cursor: pointer;
+  margin: 0.3rem;
+  padding: 0.3rem;
+}
+
+.selected {
+  background-color: #4C586F;
+  color: #fff;
+}
+
+.rover-card {
+  cursor: pointer;
+  width: 48%;
+  margin: 0.2rem;
+  padding: 0;
+  overflow: hidden;
+}
+
+.rover-card img {
+  height: 100%;
+  object-fit: cover;
+  transition: transform .5s ease; 
+}
+
+.rover-card img:hover {
+  transform: scale(1.05);
+}
+
+.rover-card figure {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  margin: 0;
+}
+
+.rover-card figcaption {
+  background-color: #4C586F;
+  color: #fff;
+  font: italic sans-serif;
+  padding: 0.9rem 0.7rem 0.7rem;
+  letter-spacing: 1px;
+}
+
+.rover-card-section {
+  text-align: center;
+}
+
+.rover-data {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.rovers-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.info-cards-list {
+  display: flex;
+  justify-content: center;
+}
+
+.info-card {
+  min-width: 100px;
+  padding: 20px 10px;
+  margin: 4px;
+  border-radius: 4px;
+}
+
+.info-card h3 {
+  letter-spacing: .1rem;
+  font-weight: 700;
+  margin-bottom: .5rem;
+}
+
+.info-card:nth-child(1) {
+  background-color: #D8E0BB;
+  color: #fff;
+}
+.info-card:nth-child(2) {
+  background-color: #B6CEC7;
+  color: #fff;
+}
+.info-card:nth-child(3) {
+  background-color: #86A3C3;
+  color: #fff;
+}
+.info-card:nth-child(4) {
+  background-color: #7268A6;
+  color: #fff;
+}
+.info-card:nth-child(5) {
+  background-color: #6B3074;
+  color: #fff;
+}
+
+.images-list {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: .5rem 0;
+  width: 100%;
+}
+
+.images-list img {
+  width: 50%;
+  padding: .2rem;
 }
 
 /* -------------------  TABLET  --------------------- */
 @media (min-width: 768px) {
-  /* use mobile */
+  header h1 {
+    font-size: 3rem;
+  }
+
+  .rover-card {
+    max-width: 30%;
+  }
 }
 
 /* -------------------  DESKTOP  -------------------- */
 
 @media (min-width: 1224px) {
-  /* use mobile */
-}
-
-/* -------------------  LARGE SCREENS  -------------- */
-
-@media (min-width: 1824px) {
-  /* use mobile */
+  main {
+    padding: 20px 10rem;
+  }
 }
