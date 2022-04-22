@@ -1,5 +1,7 @@
 const { Map, List} = Immutable;
 
+const PHOTOS_KEY = 'Most recent photos';
+
 let store = Map({
     infos: List([
         { label: 'Launch Date', selected: true, key: 'launch_date' },
@@ -60,21 +62,29 @@ const formatRoverInfo = (infos, roverData) => {
     )
 }
 
-const FilterButton = button => `<button class="btn ${button.selected ? "selected" : ""}" type="button" value="${button.label}">${button.label}</button>`
+const FilterButton = info => `<button class="btn ${info.selected ? "selected" : ""}" type="button" value="${info.label}">${info.label}</button>`
 
-const FilterButtonsList = buttons => {
+// higher order function to handle the infos
+const withInfos = fn => {
+    const infos = store.get('infos');
+
+    const mappedInfos = infos.map(info => FilterButton(info)).join('')
+
+    return fn(mappedInfos)
+}
+
+const renderFilterButtonsList = infos => {
     return `
         <section class="info-buttons-section">
             <h2>Select Filters<h2>
             <div class="buttons-list">
-                ${buttons.map(button => FilterButton(button)).join('')}
+                ${infos}
             </div>
-        </section>
-            
-    `
+        </section>      
+    `;
 }
 
-function RoverCard ({ image, name }) {
+const RoverCard = ({ image, name }) => {
     return `
         <button class="rover-card" value=${name}>
             <figure>
@@ -82,10 +92,11 @@ function RoverCard ({ image, name }) {
                 <figcaption>${name}</figcaption>
             </figure>
         </button>
-    `
+    `;
 }
 
-function RoverCardsList () {
+// higher order function that handles the rover cards
+const withRoverCardsList = fn => {
     const rovers = [
         {
             name: 'Curiosity',
@@ -100,69 +111,97 @@ function RoverCardsList () {
             image: './assets/images/mars-rover-spirit.jpeg'
         }
     ]
+    
+    const roverCardsList = rovers.map(rover => RoverCard(rover)).join('')
+
+    return fn(roverCardsList)
+}
+
+const renderRoverCardsList = (roverCardList) => {
     return `
         <section class="rover-card-section">
             <h2>Rover Cards</h2>
             <p>Click on the cards to see the respective rover data</p>
             <div class="rovers-list">
-                ${rovers.map(rover => RoverCard(rover)).join('')}
+                ${roverCardList}
             </div>
         </section>
-    `
+    `;
 }
 
-function InfoCard({ title, value }) {
+const InfoCard = ({ title, value }) => {
     return `
         <div class="info-card">
             <h3>${title}</h3>
             <div>${value}</div>
         </div>
-    `
+    `;
 }
 
-function InfoCardsList(rovers) {
+
+const InfoCardsList = rovers => {
     return `
         <div class="info-cards-list">
             ${rovers.map(rover => InfoCard(rover)).join('')}
         </div>    
-    `
+    `;
 }
 
-// wrapper for the information cards section and images
-function RoversInfoSection(infos, roverData, photos) {
-    const PHOTOS_KEY = 'Most recent photos';
-    const selectedInfo = formatRoverInfo(infos, roverData).filter(rover => rover.selected);
+
+
+const withSelectedInfos = (fn, infos, roverData) => {
+    const selectedInfos = formatRoverInfo(infos, roverData).filter(rover => rover.selected);
+
+    return fn(selectedInfos)
+}
+
+const getCardList = selectedInfo => {
     const cardsInfo = selectedInfo.filter(rover => rover.title !== PHOTOS_KEY);
-    isPhotosSelected = selectedInfo.some(info => info.title === PHOTOS_KEY)
-    
+    const cardList = InfoCardsList(cardsInfo)
+
+    return cardList
+}
+
+const getImageList = photos => selectedInfo => {
+    const isPhotosSelected = selectedInfo.some(info => info.title === PHOTOS_KEY);
+    const imageList = isPhotosSelected && RoverImagesList(photos);
+
+    return imageList;
+}
+
+const renderInfoSection = (cardList, imageList) => {  
     return `
         <section class="rover-data">
-            ${InfoCardsList(cardsInfo)}
-            ${isPhotosSelected ? RoverImagesList(photos) : ''}
+            ${cardList || ''}
+            ${imageList || ''}
         </section>
-    ` 
+    `;
 }
 
-function RoverImagesList(images) {
+const withInfoSection = (fn, cardList, imageList) => {
+    return fn(cardList, imageList);
+}
+
+const RoverImagesList = images => {
    return images ? `
         <div class="images-list">
             ${images.map(image => `<img src=${image.img_src} alt="Rover Photo" />`).join('')}
         </div>
     ` : 
-     `
+    `
         <div>
             Loading...
         </div>
-        `
+        `;
 }
 
 // add our markup to the page
-const root = document.getElementById('root')
+const root = document.getElementById('root');
 
 // immutable store updater
-function updateStore(state, newState) {
-    store = state.merge(newState)
-    render(root, store)
+const updateStore = (state, newState) => {
+    store = state.merge(newState);
+    render(root, store);
 }
 
 const render = (root, state) => {
@@ -181,14 +220,21 @@ const App = (state) => {
     const data = state.get('data');
     const photos = state.get('photos');
 
+    const cardList = data && withSelectedInfos(getCardList, infos, data.photo_manifest)
+    const imageList = data && withSelectedInfos(getImageList(photos), infos, data.photo_manifest)
+
+    const infoSection = cardList || imageList ? withInfoSection(renderInfoSection, cardList, imageList) : ''
+    const roverCardsList = withRoverCardsList(renderRoverCardsList)
+    const filterButtonsList = withInfos(renderFilterButtonsList)
+
     return `
         <header>
             <h1>Mars Rovers Dashboard</h1>
         </header>
-            ${FilterButtonsList(infos)}
-            ${RoverCardsList()}
-            ${data ? RoversInfoSection(infos, data.photo_manifest, photos) : ''}
-    `
+            ${filterButtonsList}
+            ${roverCardsList}
+            ${infoSection}
+    `;
 }
 
 // listening for load event because page should load before any JS is called
