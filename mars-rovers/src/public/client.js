@@ -32,7 +32,7 @@ const fetchRecentRoverPhotos = (date, name) => {
         .catch(error => console.error(error))
 }
 
-const formatDate = date => date.split('-').reverse().join('/')
+const formatDate = date => date.split('-').reverse().join('/');
 
 
 // fetch most recent rover photos
@@ -133,7 +133,7 @@ const InfoCard = ({ title, value }) => {
     return `
         <div class="info-card">
             <h3>${title}</h3>
-            <div>${value}</div>
+            <div>${formatDate(value)}</div>
         </div>
     `;
 }
